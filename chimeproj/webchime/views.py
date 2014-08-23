@@ -91,6 +91,14 @@ def receiver_1(request):
         )
 
 
+def select_1(request):
+    return my_render_to_response(
+        request,
+        'select.html',
+        {}
+        )
+
+
 def my_render_to_response(request, template_file, paramdict):
     response = HttpResponse()
 
