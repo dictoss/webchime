@@ -11,7 +11,7 @@ APP_STATIC_ROOT = '%s/static/' % (APP_ROOT,)
 APP_STATIC_SITE = '/static/%s/' % (APP_NAME,)
 
 LOG_LEVEL = logging.INFO
-LOG_PATH = '%s/webchime.log' % '/var/log/webchjme'
+LOG_PATH = '%s/webchime.log' % '/var/log/webchime'
 #LOG_PATH = '%s/log/markerstorage.log' % os.environ.get('HOME')
 LOG_FORMAT = '%(asctime)s,%(levelname)-8s,%(message)s'
 
