@@ -1,0 +1,106 @@
+<html>
+<head>
+<title>WebChime Receiver Pase</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<script type="text/javascript">
+var g_ws = null;
+var g_wsurl = "{{ wspush_url }}";
+var g_wstoken = "{{ wspush_recvtoken }}";
+
+function write_message(msg)
+{
+    now_dt = new Date();
+
+    oldmsg = document.form1.message.value;
+    newmsg = now_dt.toLocaleString() + ", "+ msg + "\n" + oldmsg;
+    document.form1.message.value = newmsg;
+}
+
+function play_chime()
+{
+    // alert("chime!!");
+    chimeobj = document.getElementById("chime_audio");
+    chimeobj.play();
+}
+
+function start_websocket()
+{
+    g_ws = new WebSocket(g_wsurl);
+
+    g_ws.onopen = function(){
+        console.log("IN onopen()");
+
+        // send auth message. 
+        var authmsg = {"func": "auth",
+                       "param": {"token": g_wstoken}};
+        var authmsgstr = JSON.stringify(authmsg);
+        g_ws.send(authmsgstr);
+    }
+
+    g_ws.onclose = function(event){
+        console.log("IN onclose()");
+        console.log("websocket disconnected.");
+    }
+
+    g_ws.onmessage = function(event){
+        console.log("receive message: " + event.data);
+
+        var res = JSON.parse(event.data);
+
+        if((res.func == "auth") && (res.statuscode === "200")){
+            console.log("success auth.");
+            write_message("start receive chime. (chime_id=" + document.form1.chime_id.value + ")");
+        }
+        else if((res.func === "broadcast_msg") && (res.statuscode === "200")){
+            console.log("receive broadcast_msg.");
+
+            // ring the chime
+            if(res.result.markertype === "webchime"){
+                console.log("receice chime message.")
+
+                write_message("chime_id: " + res.result.markerlist[0].chime_id + ", visitor_name: "+  res.result.markerlist[0].visitor_name);
+
+                if(document.form1.chime_id.value == res.result.markerlist[0].chime_id){
+                    console.log("same chime_id. ringing.");
+                    play_chime();
+                }
+                else{
+                    console.log("difference chime_id. not ring.");
+                }
+            }
+        }
+
+        console.log("");
+    }
+
+    window.onunload = function(){
+       var code = 4500;
+       var reason = "client closed.";
+       g_ws.close(code,reason);
+    }
+}
+
+function init()
+{
+    //start_websocket();
+}
+
+function start_receive()
+{
+    start_websocket();
+}
+
+</script>
+<body onload="init()">
+<h2>[web chime receive page]</h2>
+<form name="form1" action="">
+<p>chime_id(require)</p>
+<input name="chime_id" value="{{ chime_id }}"><br>
+<input type="button" name"start_receive_button" value="receive" onclick="start_receive()">
+<p>receive message</p>
+<textarea name="message" cols="100" rows="20"></textarea>
+</form>
+<audio id="chime_audio" src="{{ chime_audio_url }}">
+</body>
+</html>
