@@ -25,6 +25,6 @@ WSPUSH_POLLING_WAIT_MAXCOUNT = 50
 CHIME_AUDIO_URL = 'http://pcdennokan.dip.jp/static/se_maoudamashii_chime13.mp3'
 
 try:
-    from webchime_settings_devel import *
+    from .webchime_settings_devel import *
 except:
     pass

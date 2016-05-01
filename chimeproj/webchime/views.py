@@ -133,10 +133,11 @@ class MyWebSocketClient(WebSocketClient):
             (code, reason))
 
     def received_message(self, m):
-        logger.info('message received: %s' % m.data)
-
         try:
-            convjson = json.loads(m.data)
+            data_s = m.data.decode()
+            logger.info('message received: %s' % data_s)
+
+            convjson = json.loads(data_s)
 
             if convjson['func'] == 'auth':
                 if convjson['statuscode'] == '200':
